@@ -6,7 +6,7 @@ public class Main
 		String cognome = "Corso";
 		System.out.println(iniziali(nome, cognome));
 
-		System.out.println("The reverse of \"abcd\" is " + stringReverse("abcd"));
+		System.out.println("The reverse of \"ciao\" is " + stringReverse("ciao"));
 
 		System.out.println("Occorrenze: " + contaOccorrenze("AA", "AAAAA"));
 
@@ -22,6 +22,24 @@ public class Main
 		System.out.println("\nFibonacci strings:");
 		for(int i = 1; i <= 10; i++)
 			System.out.println("fib(" + i + ") = " + fibonacciString(i));
+		
+		System.out.println("\nRandom strings:");
+		for(int i = 0; i <= 10; i++)
+			System.out.println(randomString(10, 6));
+
+		System.out.println("\nSum of digit of 12345: " + sumOfDigit(12345));
+
+		System.out.println("\nElimina vocali: " + eliminaVocali("Ciao mi chiamo Vincenzo Corso."));
+
+		System.out.println("\nRappresentazione unaria di 6: " + rappresentazioneUnaria(6));
+
+		System.out.println("\nString capitalize: " + stringCapitalize("Questa e' una stringa"));
+
+		System.out.println("\nciao is anagram of icao? " + isAnagram("ciao", "icao"));
+		System.out.println("\nciao is anagram of icaao? " + isAnagram("ciao", "icaao"));
+		System.out.println("\nciao is anagram of ziczao? " + isAnagram("ciao", "ziczao"));
+		System.out.println("\nciao is anagram of ical? " + isAnagram("ciao", "ical"));
+		System.out.println("\nciao is anagram of oaic? " + isAnagram("ciao", "oaic"));
 	}
 
 	public static String iniziali(String nome, String cognome)
@@ -36,6 +54,11 @@ public class Main
 		for(int i = s.length() - 1; i >= 0; i--)
 			a.append(s.charAt(i));
 		return a.toString();
+
+		/*	oppure ;)
+			StringBuilder a = new StringBuilder(s);
+			return a.reverse().toString();
+		*/
 	}
 
 	public static int contaOccorrenze(String pattern, String s)
@@ -59,15 +82,14 @@ public class Main
 			2. @
 			3. Sequenza di caratteri alfanumerici compreso il punto
 			4. .
-			5. Una sequenza di 2 o 3 caratteri minuscoli
+			5. Una sequenza di almeno 2 caratteri minuscoli
 		*/
-		return email.matches("[\\w&&[^_]]*@[\\w\\.]*\\.[a-z]{2,3}");
+		return email.matches("[\\w&&[^_]]*@[\\w\\.]*\\.[a-z]{2,}");
 	}
 
 	public static boolean isValidEmail(String email)
 	{
 		boolean nome = true, dominio = false, estensione = false;
-		boolean flag = false;
 
 		for(int i = 0; i < email.length(); i++)
 		{
@@ -77,8 +99,11 @@ public class Main
 				{
 					nome = false;
 					dominio = true;
+
+					if(email.indexOf(".", i+1) == -1)
+						return false;
 				}
-				else if(!Character.isDigit(email.charAt(i)) || !Character.isLetter(email.charAt(i)) || email.charAt(i) == '_')
+				else if((!Character.isDigit(email.charAt(i)) && !Character.isLetter(email.charAt(i))) || email.charAt(i) == '_')
 					return false;
 			}
 			else if(dominio)
@@ -91,39 +116,100 @@ public class Main
 						estensione = true;
 					}
 				}
-				else if(!Character.isDigit(email.charAt(i)) || !Character.isLetter(email.charAt(i)))
+				else if(!Character.isDigit(email.charAt(i)) && !Character.isLetter(email.charAt(i)))
 					return false;
 			}
 			else if(estensione)
 			{
-				if(Character.isLetter(email.charAt(i)))
-				{
-					if(i == email.length() - 1)
-						flag = true;
-				}
-				else if(email.length() - i < 2 && email.length() - i > 3)
+				if(!Character.isLetter(email.charAt(i)))
 					return false;
-				else return false;
 			}
 		}
 
-		return flag;
+		return true;
 	}
 
 	public static String fibonacciString(int n)
 	{
-		String[] dp = new String[1000];
-		dp[0] = "";
-		dp[1] = "b";
-		dp[2] = "a";
-		
-		int j = 2;
-		while(j < n)
+		StringBuilder i = new StringBuilder("b");
+		StringBuilder j = new StringBuilder("a");
+
+		if(n == 1)
+			return i.toString();
+		else if(n == 2)
+			return j.toString();
+
+		for(int k = 2; k < n; k++)
 		{
-			dp[j+1] = dp[j].concat(dp[j-1]);
-			j++;
+			int j_length = j.length();
+			j.append(i);
+			i.replace(0, i.length(), j.substring(0, j_length).toString());
 		}
 
-		return dp[n];
+		return j.toString();
+	}
+
+	public static String randomString(int a, int n)
+	{
+		StringBuilder risultato = new StringBuilder();
+		for(int i = 0; i < n; i++)
+			risultato.append(String.valueOf((int)(Math.random() * a)));
+		return risultato.toString();
+	}
+
+	public static int sumOfDigit(int n)
+	{
+		String a = String.valueOf(n);
+		int risultato = 0;
+
+		for(int i = 0; i < a.length(); i++)
+			risultato += Integer.parseInt("" + a.charAt(i));
+		
+		return risultato;
+	}
+
+	public static boolean isAnagram(String a, String b)
+	{
+		StringBuilder temp = new StringBuilder(b);
+
+		for(int i = 0; i < a.length(); i++)
+		{
+			int index = temp.indexOf("" + a.charAt(i));
+			if(index != -1)
+				temp.deleteCharAt(temp.indexOf("" + a.charAt(i)));
+			else return false;
+		}
+
+		return (temp.length() != 0) ? false : true;
+	}
+
+	public static String eliminaVocali(String s)
+	{
+		return s.replaceAll("[aeiou]", "");
+	}
+
+	public static String rappresentazioneUnaria(int n)
+	{
+		StringBuilder s = new StringBuilder();
+		for(int i = 1; i <= n; i++)
+			s.append("0");
+		return s.toString();
+	}
+
+	public static String stringCapitalize(String s)
+	{
+		StringBuilder risultato = new StringBuilder(s);
+		risultato.setCharAt(0, Character.toUpperCase(risultato.charAt(0)));
+
+		for(int i = 1; i < s.length(); i++)
+		{
+			if(Character.isWhitespace(s.charAt(i)))
+			{
+				i++;
+				risultato.setCharAt(i, Character.toUpperCase(risultato.charAt(i)));
+			}
+		}
+
+		return risultato.toString();
 	}
 }

@@ -35,16 +35,14 @@ public class Parallelogramma extends Trapezio
 		Parallelogramma a;
 
 		// Parallelogrammi validi
-		vertici = new Punto[]{new Punto(0.0, 3.0), new Punto(3.0, 3.0), new Punto(5.0, 0.0), new Punto()};
-		a = new Parallelogramma(vertici);
-		System.out.println("Perimetro: " + a.calcolaPerimetro() + "\nArea: " + a.calcolaArea() + "\n");
-
-		vertici = new Punto[]{new Punto(-1.0, -3.0), new Punto(-2.0, 0.0), new Punto(0.0, 2.0), new Punto(4.0, 2.0)};
+		vertici = new Punto[]{new Punto(-1.0, 3.0), new Punto(3.0, 3.0), new Punto(1.0, -1.0), new Punto(-3.0, -1.0)};
 		a = new Parallelogramma(vertici);
 		System.out.println("Perimetro: " + a.calcolaPerimetro() + "\nArea: " + a.calcolaArea() + "\n");
 
 		// Parallelogrammi non validi (restituiscono un errore)
 		vertici = new Punto[]{new Punto(-2.0, 0.0), new Punto(0.0, 4.0), new Punto(2.0, 1.0), new Punto(2.0, -1.0)};
+		a = new Parallelogramma(vertici);
+		vertici = new Punto[]{new Punto(0.0, 3.0), new Punto(3.0, 3.0), new Punto(5.0, 0.0), new Punto()};
 		a = new Parallelogramma(vertici);
 	}
 }

@@ -19,62 +19,46 @@ public class Quadrilatero
 	*/
 	public Quadrilatero(Punto[] vertici)
 	{
-		if(vertici.length == 4)
+		// Controlla se ci sono tre vertici allineati.
+		boolean flag = false;
+		double[] m = new double[4];
+		for(int i = 0; i < 4 && !flag; i++)
 		{
-			double mab = (vertici[1].getY() - vertici[0].getY()) / (vertici[1].getX() - vertici[0].getX());
-			double mbc = (vertici[2].getY() - vertici[1].getY()) / (vertici[2].getX() - vertici[1].getX());
-			double yp = vertici[3].getY();
+			m[i] = (vertici[(i+1)%4].getY() - vertici[i].getY()) / (vertici[(i+1)%4].getX() - vertici[i].getX());
+			if(!Double.isInfinite(m[i]) && (vertici[(i+2)%4].getY() == m[i] * (vertici[(i+2)%4].getX() - vertici[i].getX()) + vertici[i].getY()))
+				flag = true;
+			else if(vertici[i].getX() == vertici[(i+1)%4].getX() && vertici[i].getX() == vertici[(i+2)%4].getX())
+				flag = true;
+		}
 
-			boolean flag = true;
-			if(mab != mbc)
-			{
-				double k1 = mab * (vertici[3].getX() - vertici[0].getX()) + vertici[0].getY();
-				double k2 = mbc * (vertici[3].getX() - vertici[1].getX()) + vertici[1].getY();
+		if(!flag)
+		{
+			// Controlla se i lati non adiacenti si intersecano
+			double ya = m[2] * (vertici[0].getX() - vertici[2].getX()) + vertici[2].getY();
+			double yb = m[2] * (vertici[1].getX() - vertici[2].getX()) + vertici[2].getY();
+			double yc = m[0] * (vertici[2].getX() - vertici[0].getX()) + vertici[0].getY();
+			double yd = m[0] * (vertici[3].getX() - vertici[0].getX()) + vertici[0].getY();
 
-				if(vertici[0].getX() != vertici[2].getX())
-				{
-					double mac = (vertici[0].getY() - vertici[2].getY()) / (vertici[0].getX() - vertici[2].getX());
-					double k3 = mac * (vertici[1].getX() - vertici[0].getX()) + vertici[0].getY();
+			boolean flag1 = false;
+			if((vertici[0].getY() - ya) * (vertici[1].getY() - yb) <= 0 && (vertici[2].getY() - yc) * (vertici[3].getY() - yd) <= 0)
+				flag1 = true;
 
-					if(vertici[1].getY() > k3) // caso 1
-					{
-						double k4 = mac * (vertici[3].getX() - vertici[0].getX()) + vertici[0].getY();
+			yb = m[3] * (vertici[1].getX() - vertici[3].getX()) + vertici[3].getY();
+			yc = m[3] * (vertici[2].getX() - vertici[3].getX()) + vertici[3].getY();
+			ya = m[1] * (vertici[0].getX() - vertici[1].getX()) + vertici[1].getY();
+			yd = m[1] * (vertici[3].getX() - vertici[1].getX()) + vertici[1].getY();
 
-						if( (yp >= k4 && (yp >= k1 || yp >= k2)) || (yp == k1 || yp == k2) )
-							flag = false;
-					}
-					else if(vertici[1].getY() < k3) // caso 2
-					{
-						if( yp >= k1 || yp >= k2 )
-							flag = false;
-					}
-					else flag = false;
-				}
-				else
-				{
-					if(vertici[1].getX() > vertici[0].getX()) // caso 3
-					{
-						if( (vertici[3].getX() >= vertici[0].getX() && (yp >= k1 || yp <= k2)) || vertici[3].getX() == vertici[0].getX() )
-							flag = false;
-					}
-					else if(vertici[1].getX() < vertici[0].getX()) // caso 4
-					{
-						if( yp <= k1 || yp >= k2 )
-							flag = false;
-					}
-					else flag = false;
-				}
-			}
-			else flag = false;
-			
-			if(flag)
+			boolean flag2 = false;
+			if((vertici[1].getY() - yb) * (vertici[2].getY() - yc) <= 0 && (vertici[0].getY() - ya) * (vertici[3].getY() - yd) <= 0)
+				flag2 = true;
+
+			if(!flag1 && !flag2)
 			{
 				this.vertici = Arrays.copyOf(vertici, vertici.length);
+				this.direzioneLati = m;
 				for(int i = 0; i < 4; i++)
 				{
-					/* Precalcola il coefficente angolare delle rette che individuano i lati del quadrilatero.
-					Nei casi in cui si hanno lati paralleli all'asse y non si deve distinguere tra +infinito e -infinito. */
-					this.direzioneLati[i] = (vertici[(i+1)%4].getY() - vertici[i].getY()) / (vertici[(i+1)%4].getX() - vertici[i].getX());
+					// Nei casi in cui si hanno lati paralleli all'asse y non si deve distinguere tra +infinito e -infinito.
 					if(Double.isInfinite(this.direzioneLati[i]))
 						this.direzioneLati[i] = Double.POSITIVE_INFINITY;
 
@@ -82,9 +66,9 @@ public class Quadrilatero
 					this.lunghezzaLati[i] = vertici[i].calcolaDistanza(vertici[(i+1)%4]);
 				}
 			}
-			else System.out.println("Errore: i quattro punti non individuano un quadrilatero o non sono stati inseriti nell'ordine corretto.");
+			else System.out.println("Errore: i quattro punti non individuano un quadrilatero.");
 		}
-		else System.out.println("Errore: bisogna definire quattro punti.");
+		else System.out.println("Errore: ci sono tre punti allineati.");
 	}
 
 	/**
@@ -130,51 +114,39 @@ public class Quadrilatero
 	{
 		System.out.println("Test della classe Quadrilatero");
 		Punto[] vertici;
-		Quadrilatero a;
 
 		// Quadrilateri validi: convessi e non convessi (non intrecciati)
 		vertici = new Punto[]{new Punto(-2.0, 0.0), new Punto(0.0, 4.0), new Punto(2.0, 1.0), new Punto(2.0, -1.0)};
-		a = new Quadrilatero(vertici);
-		System.out.println("Perimetro: " + a.calcolaPerimetro() + "\nArea: " + a.calcolaArea() + "\n");
-
+		Quadrilatero a = new Quadrilatero(vertici);
 		vertici = new Punto[]{new Punto(-2.0, 0.0), new Punto(0.0, 4.0), new Punto(2.0, 0.0), new Punto(2.0, -1.0)};
-		a = new Quadrilatero(vertici);
-		System.out.println("Perimetro: " + a.calcolaPerimetro() + "\nArea: " + a.calcolaArea() + "\n");
-
+		Quadrilatero b = new Quadrilatero(vertici);
 		vertici = new Punto[]{new Punto(-2.0, 0.0), new Punto(1.0, -1.0), new Punto(2.0, 1.0), new Punto(2.0, -5.0)};
-		a = new Quadrilatero(vertici);
-		System.out.println("Perimetro: " + a.calcolaPerimetro() + "\nArea: " + a.calcolaArea() + "\n");
-
+		Quadrilatero c = new Quadrilatero(vertici);
 		vertici = new Punto[]{new Punto(0.0, 2.0), new Punto(2.0, -2.0), new Punto(0.0, -4.0), new Punto(-1.0, -6.0)};
-		a = new Quadrilatero(vertici);
-		System.out.println("Perimetro: " + a.calcolaPerimetro() + "\nArea: " + a.calcolaArea() + "\n");
-
+		Quadrilatero d = new Quadrilatero(vertici);
 		vertici = new Punto[]{new Punto(0.0, 2.0), new Punto(2.0, -2.0), new Punto(0.0, -4.0), new Punto(-2.0, -2.0)};
-		a = new Quadrilatero(vertici);
-		System.out.println("Perimetro: " + a.calcolaPerimetro() + "\nArea: " + a.calcolaArea() + "\n");
-
+		Quadrilatero e = new Quadrilatero(vertici);
 		vertici = new Punto[]{new Punto(1.0, 2.0), new Punto(), new Punto(1.0, -4.0), new Punto(-2.0, -1.0)};
-		a = new Quadrilatero(vertici);
-		System.out.println("Perimetro: " + a.calcolaPerimetro() + "\nArea: " + a.calcolaArea() + "\n");
-
+		Quadrilatero f = new Quadrilatero(vertici);
 		vertici = new Punto[]{new Punto(1.0, 2.0), new Punto(), new Punto(1.0, -4.0), new Punto(-2.0, -3.0)};
-		a = new Quadrilatero(vertici);
-		System.out.println("Perimetro: " + a.calcolaPerimetro() + "\nArea: " + a.calcolaArea() + "\n");
+		Quadrilatero g = new Quadrilatero(vertici);
+		vertici = new Punto[]{ new Punto(-2.0, 0.0), new Punto(0.0, 4.0), new Punto(2.0, 1.0), new Punto(4.0, 1.0)};
+		Quadrilatero h = new Quadrilatero(vertici);
+
+		Quadrilatero[] quadrilateri = new Quadrilatero[]{a, b, c, d, e, f, g, h};
+		for(Quadrilatero q : quadrilateri)
+			System.out.println("Perimetro: " + q.calcolaPerimetro() + "\nArea: " + q.calcolaArea() + "\n");
 
 		// Quadrilateri non validi: non convessi intrecciati (restituiscono un errore)
 		/*vertici = new Punto[]{ new Punto(-2.0, 0.0), new Punto(0.0, 4.0), new Punto(2.0, 1.0), new Punto(3.0, 3.0)};
-		a = new Quadrilatero(vertici);*/
-		/*vertici = new Punto[]{ new Punto(-2.0, 0.0), new Punto(0.0, 4.0), new Punto(2.0, 1.0), new Punto(4.0, 1.0)};
-		a = new Quadrilatero(vertici);*/
-		/*vertici = new Punto[]{ new Punto(-2.0, 0.0), new Punto(0.0, 4.0), new Punto(2.0, 1.0), new Punto(1.0, 3.0)};
-		a = new Quadrilatero(vertici);*/
-		/*vertici = new Punto[]{ new Punto(0.0, 2.0), new Punto(2.0, -2.0), new Punto(0.0, -4.0), new Punto(2.0, -5.0)};
-		a = new Quadrilatero(vertici);*/
-		/*vertici = new Punto[]{ new Punto(0.0, 2.0), new Punto(2.0, -2.0), new Punto(0.0, -4.0), new Punto(0.0, -1.0)};
-		a = new Quadrilatero(vertici);*/
-		/*vertici = new Punto[]{new Punto(1.0, 2.0), new Punto(), new Punto(1.0, -4.0), new Punto(-2.0, -4.0)};
-		a = new Quadrilatero(vertici);*/
-		/*vertici = new Punto[]{new Punto(1.0, 2.0), new Punto(), new Punto(1.0, -4.0), new Punto(3.0, -1.0)};
+		a = new Quadrilatero(vertici);
+		vertici = new Punto[]{ new Punto(-2.0, 0.0), new Punto(0.0, 4.0), new Punto(2.0, 1.0), new Punto(1.0, 3.0)};
+		a = new Quadrilatero(vertici);
+		vertici = new Punto[]{ new Punto(0.0, 2.0), new Punto(2.0, -2.0), new Punto(0.0, -4.0), new Punto(2.0, -5.0)};
+		a = new Quadrilatero(vertici);
+		vertici = new Punto[]{ new Punto(0.0, 2.0), new Punto(2.0, -2.0), new Punto(0.0, -4.0), new Punto(0.0, -1.0)};
+		a = new Quadrilatero(vertici);
+		vertici = new Punto[]{new Punto(1.0, 2.0), new Punto(), new Punto(1.0, -4.0), new Punto(-2.0, -4.0)};
 		a = new Quadrilatero(vertici);*/
 	}
 }

@@ -33,7 +33,7 @@ public class Rettangolo extends Parallelogramma
 
 		// Rettangoli validi
 		vertici = new Punto[]{new Punto(), new Punto(0.0, 3.0), new Punto(5.0, 3.0), new Punto(5.0, 0.0)};
-		a = new Parallelogramma(vertici);
+		a = new Rettangolo(vertici);
 		System.out.println("Perimetro: " + a.calcolaPerimetro() + "\nArea: " + a.calcolaArea() + "\n");
 
 		// Rettangoli non validi (restituiscono un errore)

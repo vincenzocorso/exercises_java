@@ -1,3 +1,4 @@
+package stack;
 import java.util.*;
 
 public class ArrayStack<T> implements Stack<T>

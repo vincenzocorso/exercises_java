@@ -1,3 +1,4 @@
+package stack;
 import java.util.*;
 
 public class LinkedListStack<T> implements Stack<T>

@@ -11,7 +11,7 @@ public class ArrayStack<T> implements Stack<T>
 	public ArrayStack(int initialCapacity, double loadFactor)
 	throws IllegalArgumentException
 	{
-		if(initialCapacity < 0 || loadFactor <= 0)
+		if(initialCapacity <= 0 || loadFactor <= 0)
 			throw new IllegalArgumentException();
 
 		this.stack = (T[]) new Object[initialCapacity];
@@ -74,7 +74,7 @@ public class ArrayStack<T> implements Stack<T>
 	@Override
 	public void clear()
 	{
-		this.stack = (T[])new Object[0];
+		this.stack = (T[])new Object[4];
 		this.size = 0;
 	}
 

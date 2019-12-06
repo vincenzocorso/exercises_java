@@ -9,18 +9,6 @@ public class Calcolatrice
 	{
 		return (s.equals("+") || s.equals("*") || s.equals("-") | s.equals("/"));
 	}
-
-	private static int compareOperator(String operatore1, String operatore2)
-	{
-		String[] a = new String[]{"/", "*", "+", "-"};
-		ArrayList<String> precedenza = new ArrayList<>(Arrays.asList(a));
-		if(precedenza.indexOf(operatore1) < precedenza.indexOf(operatore2))
-			return -1;
-		else if(precedenza.indexOf(operatore1) > precedenza.indexOf(operatore2))
-			return 1;
-		else
-			return 0;
-	}
 	
 	private static double applyOperator(double operando1, double operando2, String operatore)
 	throws IllegalArgumentException
@@ -50,24 +38,13 @@ public class Calcolatrice
 			if(in.hasNext())
 			{
 				String operatore = in.next();
-				if(!operatore.equals("("))
+				if(operatore.equals(")"))
 				{
-					if(operatore.equals(")"))
-					{
-						while(!operatori.isEmpty())
-						{
-							double o2 = operandi.pop();
-							operandi.push(applyOperator(operandi.pop(), o2, operatori.pop()));
-						}
-					}
-					else while(!operatori.isEmpty() && compareOperator(operatore, operatori.peek()) > 0)
-					{
-						double o2 = operandi.pop();
-						operandi.push(applyOperator(operandi.pop(), o2, operatori.pop()));
-					}
-					
-					operatori.push(operatore);
+					double o2 = operandi.pop();
+					operandi.push(applyOperator(operandi.pop(), o2, operatori.pop()));
 				}
+				else if(isOperator(operatore))
+					operatori.push(operatore);
 			}
 		}
 		return operandi.pop();
@@ -112,7 +89,10 @@ public class Calcolatrice
 		exp = "2 -3 -";
 		System.out.println("Risultato: " + calcolaEspressionePostfissa(exp));
 
-		exp = "( 2 / 2 * 3 + 4 * 2 / 4 )";
+		exp = "( ( ( 2 / 2 ) * 3 ) + ( ( 4 * 2 ) / 4 ) )";
+		System.out.println("Risultato: " + calcolaEspressioneInfissa(exp));
+
+		exp = "( ( 1 + 3 ) + ( 3 * ( 1 - 2 ) ) )";
 		System.out.println("Risultato: " + calcolaEspressioneInfissa(exp));
 	}
 }

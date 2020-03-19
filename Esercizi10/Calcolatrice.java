@@ -32,7 +32,7 @@ public class Calcolatrice
 		Scanner in = new Scanner(exp);
 		while(in.hasNext())
 		{
-			while(in.hasNextDouble())
+			if(in.hasNextDouble())
 				operandi.push(in.nextDouble());
 			
 			if(in.hasNext())
